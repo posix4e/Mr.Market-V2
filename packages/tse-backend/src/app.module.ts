@@ -5,6 +5,7 @@ import { TypeormConfig } from './common/config/typeorm.config';
 import { IntegrationsModule } from './integrations/integrations.module';
 import { ExchangeRegistryModule } from './modules/exchange-registry/exchange-registry.module';
 import { ExchangeRegistryService } from './modules/exchange-registry/exchange-registry.service';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { ExchangeDataModule } from './modules/exchange-data/exchange-data.module';
 import { AutomapperModule } from '@automapper/nestjs';
 import { classes } from '@automapper/classes';
@@ -42,7 +43,7 @@ import { WebSchedulerModule } from './modules/web-scheduler/web-scheduler.module
     ScheduleModule.forRoot(),
     IntegrationsModule,
     ExchangeRegistryModule,
-    ExchangeDataModule,
+    // ExchangeDataModule,
     ExchangeOperationModule,
     ExchangeTradeModule,
     HealthModule,
