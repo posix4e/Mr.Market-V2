@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mrmarket-combined-api
+    ports:
+      - "${PORT:-3000}:${PORT:-3000}"
+    environment:
+      - PORT=${PORT:-3000}
+      - NODE_ENV=${NODE_ENV:-development}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRATION=${JWT_EXPIRATION:-1d}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - MIXIN_APP_ID=${MIXIN_APP_ID}
+      - MIXIN_SESSION_ID=${MIXIN_SESSION_ID}
+      - MIXIN_SERVER_PUBLIC_KEY=${MIXIN_SERVER_PUBLIC_KEY}
+      - MIXIN_SESSION_PRIVATE_KEY=${MIXIN_SESSION_PRIVATE_KEY}
+      - MIXIN_SPEND_PRIVATE_KEY=${MIXIN_SPEND_PRIVATE_KEY}
+      - MIXIN_OAUTH_SECRET=${MIXIN_OAUTH_SECRET}
+      - MIXIN_OAUTH_SCOPE=${MIXIN_OAUTH_SCOPE}
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=${POSTGRES_PORT:-5432}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - POSTGRES_DB=${POSTGRES_DB:-mrmarket_combined}
+      - DATABASE_LOGGING_LEVEL=${DATABASE_LOGGING_LEVEL:-error}
+      - DATABASE_SYNCHRONIZE=${DATABASE_SYNCHRONIZE:-false}
+      - DATABASE_AUTO_RUN_MIGRATIONS=${DATABASE_AUTO_RUN_MIGRATIONS:-true}
+      - DATABASE_SSL=${DATABASE_SSL:-false}
+      - REDIS_HOST=redis
+      - REDIS_PORT=${REDIS_PORT:-6379}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - REDIS_DB=${REDIS_DB:-0}
+      - REDIS_URL=redis://${REDIS_PASSWORD:+:${REDIS_PASSWORD}@}redis:6379/${REDIS_DB:-0}
+      - SANDBOX=${SANDBOX:-true}
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      - postgres
+      - redis
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: mrmarket-combined-postgres
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - POSTGRES_DB=${POSTGRES_DB:-mrmarket_combined}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: mrmarket-combined-redis
+    command: redis-server ${REDIS_PASSWORD:+--requirepass ${REDIS_PASSWORD}}
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
